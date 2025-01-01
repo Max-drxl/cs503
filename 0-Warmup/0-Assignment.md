@@ -15,7 +15,10 @@ Please provide answers to these questions using markdown notation and place them
 - [] NO - Not Yet
 
 3. Please provide a link to the repository you are using for this class.
+[My GitHub Repo](https://github.com/Max-drxl/cs503)
 
 4. Briefly describe what you want to get out of this class.
+I want to gain comfort using the Linux operating system and understand how programs are run safely by memory allocation and management.
 
 5. Briefly describe any concerns you might be having with being successful in this class (if any).
+I am new to programming, 'make', and git with only minor Linux experience so I have a lot to catch up on. I plan to meet with the instructors as noted in the syllabus and will be seeking out additional resources to get around this.
