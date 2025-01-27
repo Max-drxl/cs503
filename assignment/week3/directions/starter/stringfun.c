@@ -59,12 +59,12 @@ int count_words(char *buff, int str_len){
     int word_start = 0;
     int wc = 0;
     char *buff_chars = buff;
-    int i = 0;
+    char *end_str = buff + str_len;
 
     //iterate over the pointers in buff until reaching length of str
     //basically the same code as before just without array notation
     //and don't need to check for doublespaces
-    for (buff_chars; i < str_len; buff_chars++) {
+    while (buff_chars < end_str) {
         if (word_start < 1) {
             if (*buff_chars != SPACE_CHAR) {
                 wc++;
@@ -75,8 +75,7 @@ int count_words(char *buff, int str_len){
                 word_start = 0;
             }
         }
-        //incrementing until we hit length of users' string
-        i++;
+        buff_chars++;
     }
     return wc;
 }
@@ -120,9 +119,6 @@ void space_strip(char *user_str){
     }
     //ensure our last pointer is null-terminated
     *new_str = NULL_TERM;
-    //I think that since we never update the pointer references in *old
-    //with *new during the loop this allows *new to be the reference 
-    //for the updated user_str even though *old is also a reference
 }
 
 int string_length(char *user_str, int len){
@@ -163,13 +159,13 @@ void word_print(char *buff, int str_len){
     int word_start = 0;
     int wc = 0;
     char *buff_chars = buff;
-    int i = 0;
     int wlen = 0;
+    char *end_str = buff_chars + str_len;
 
     //same start as count_words -c however need to also 
     //keep track of length of words and print things out
     //i could re-use string_length here but that's more complicated
-    for (buff_chars; i < str_len; buff_chars++) {
+    while (buff_chars < end_str) {
         if (word_start < 1) {
             if (*buff_chars != SPACE_CHAR) {
                 wc++;
@@ -184,9 +180,9 @@ void word_print(char *buff, int str_len){
             }
         }
         //incrementing until we hit length of users' string
-        i++;
         printf("%c", *buff_chars);
         wlen++;
+        buff_chars++;
     }
     //loop ends before last length so added here
     printf(" (%d)\n", wlen);
@@ -200,13 +196,14 @@ void string_replace(char *buff, int len, int str_len, char *sub_str, char *repla
     char *sub_str_chars = sub_str;
     char *sub_match_test = NULL;
     char *rep = replacer;
-    int i = 0;
     int matchFound;
+    char *end_str = buff_find_chars + str_len;
+    char *end_ptr = buff_find_chars + len;
 
-    //couldn't find another way to do this without an additional copy
+    //couldn't find another way to do this without an additional malloc
     buff_rep_chars = malloc(len);
     if (buff_rep_chars == NULL) {
-        printf("Error allocating memory for buffer, buff == NULL\n");
+        printf("Error allocating memory for buffer, buff_rep_chars == NULL\n");
         //readme says to use exit(2) to indicate memory allocation fail
         exit(2);
     }
@@ -218,7 +215,7 @@ void string_replace(char *buff, int len, int str_len, char *sub_str, char *repla
 
     //iterate through the users' string to find the match pointer position
     //and get all my pointers in the right places for replacement
-    for (buff_find_chars; i < str_len; buff_find_chars++) {
+    while (buff_find_chars < end_str) {
         //potential match
         if (*buff_find_chars == *sub_str_chars) {
             //test pointer to confirm all characters match
@@ -239,7 +236,6 @@ void string_replace(char *buff, int len, int str_len, char *sub_str, char *repla
             //*match_test now has the rest of the users' string + filler 
             //after the sub_str
             //*buff_chars now is starting at the beginning of the sub_str
-            //'i' also does not need to be rewound as we can continue our loop
             if (matchFound == 1) {
                 sub_match_test = NULL;
 
@@ -247,25 +243,24 @@ void string_replace(char *buff, int len, int str_len, char *sub_str, char *repla
                 //buff_find_chars = replacer + match_test until len=50
                 //which will truncate to 50 and prevent errors
                 while (rep < replacer + replacer_len) {
-                    if (i < len) {
+                    if (buff_find_chars < end_ptr) {
                         *buff_find_chars = *rep;
                         buff_find_chars++;
                         rep++;
-                        i++;
                     } else {
                         break;
                     }
 
                 }
-                for (buff_find_chars; i < len; buff_find_chars++) {
+                while (buff_find_chars < end_ptr) {
                     *buff_find_chars = *match_test;
                     match_test++;
-                    i++;
+                    buff_find_chars++;
                 }
                 break;
             }
         }
-        i++;
+        buff_find_chars++;
         buff_rep_chars++;
     }
     //exit now if no matching string found from provided input
@@ -399,9 +394,9 @@ int main(int argc, char *argv[]){
 //spend additional processing on the internal buffer dot padding
 //because we can stop at the known length of the str. In this 
 //assignment I didn't use the buffer size inside most of the 
-//helper functions until we reached string_replace. Our
-//setup_buff and string_length functions use the buffer size to 
-//ensure the string from the user is 50 chars or less so we 
-//don't need to worry about it until we're replacing things in
-//the string, then we run the risk of going over 50 but I also
-//decided to truncate to 50 chars instead of erroring.
+//functions until we reached string_replace. Our setup_buff and
+//string_length helpers use the buffer size to ensure the string
+//from the user is 50 chars or less so we don't need to worry about 
+//it until we're replacing things in the string, then we run the 
+//risk of going over 50 but I also truncate to 50 chars instead of 
+//erroring.
